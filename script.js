@@ -42,6 +42,28 @@ document.getElementById("file-input").addEventListener("change", async (event) =
 
 // Parse do arquivo
 function parseObjFile(data) {
-    // Fazer o parse do arquivo aqui e montar a matriz de pontos pra gente poder começar a executar
+    const lines = data.split('\n');
+    const vertices = []; 
+    const faces = []; 
+
+    lines.forEach((line) => {
+        const parts = line.trim().split(/\s+/);
+        if (parts[0] === 'v') {
+            // se for um vértice
+            const vertex = parts.slice(1).map(Number);
+            vertices.push(vertex);
+        } else if (parts[0] === 'f') {
+            // se for uma face
+            const face = parts.slice(1).map(triade => {
+                return parseInt(triade.split('/')[0], 10); // dependendo do arquivo, as faces são definidas como 'f 1/2/3', em que 2 representa a textura e 1 é o índice do vetor normal
+            });
+            faces.push(face);
+        }
+    });
+
+    console.log("Vertices:", vertices);
+    console.log("Faces:", faces);
+
+    return {vertices, faces}
 }
 
