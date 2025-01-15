@@ -50,17 +50,17 @@ function carregarDadosDoPlano()
     }
 
     u = u.map((valor) => {
-        let t = parseInt(valor);
+        let t = parseFloat(valor);
         if (isNaN(t))
         {
             alert("Argumentos do plano inválidos, tente novamente");
             throw "Argumentos do plano inválidos, tente novamente";
         }
-        return parseInt(valor);
+        return parseFloat(valor);
     })
 
     v = v.map((valor) => {
-        let t = parseInt(valor);
+        let t = parseFloat(valor);
         if (isNaN(t))
         {
             alert("Argumentos do plano inválidos, tente novamente");
@@ -70,13 +70,13 @@ function carregarDadosDoPlano()
     })
 
     w = w.map((valor) => {
-        let t = parseInt(valor);
+        let t = parseFloat(valor);
         if (isNaN(t))
         {
             alert("Argumentos do plano inválidos, tente novamente");
             throw "Argumentos do plano inválidos, tente novamente";
         }
-        return parseInt(valor);
+        return parseFloat(valor);
     })
 
     plano = [u, v, w];
