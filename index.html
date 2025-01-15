@@ -45,16 +45,36 @@
         </fieldset>
 
         <fieldset class="mb-3">
-            <legend>Tipo de Projeção</legend>
-            <select id="tipo-projecao" class="form-select">
-                <option value="conica">Cônica</option>
-                <option value="cilindrica">Cilíndrica</option>
+            <legend>Tipo de desenho</legend>
+            <select id="tipo-desenho" class="form-select">
+                <option value="0">Pontos</option>
+                <option value="1">Linhas</option>
+                <option value="2">Formas</option>
             </select>
         </fieldset>
 
-        <button type="button" id="executar" class="btn btn-primary w-100 mb-2" disabled>Executar</button>
+        <button type="button" id="executar" class="btn btn-primary w-100" disabled>Executar</button>
         <button type="button" id="pausar" class="btn btn-danger w-100" disabled>Pausar</button>
         <button type="button" id="carregar" class="btn btn-success w-100">Carregar dados</button>
+        
+
+        <hr>
+
+        <h3 class="text-center">Controles</h3>
+
+        Espaço + Mexer o mouse = Rotacionar a tela
+
+        <br>
+
+        Roda do mouse = Zoom
+
+        <br>
+
+        Clicar e arrastar = Mover o objeto
+
+        <button type="button" id="limpar-modelo" class="btn btn-warning w-100"> Limpar modelo </button>
+       
+        
     </nav>
 
     <div class="flex-grow-1 d-flex align-items-center justify-content-center bg-dark" id="main-content", style="width: 75%;">
