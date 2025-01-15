@@ -294,12 +294,28 @@ function draw() {
 
     calcularTransformacaoViewport();
 
-    console.log(matrizFinal);
+    // console.log(matrizFinal);
     // Draw points
 
     stroke(255, 255, 255);
-    for (let i = 0; i < matrizDoObjeto.length; i++) {
-        point(matrizFinal.get([0, i]), matrizFinal.get([1, i]));
+    // for (let i = 0; i < matrizDoObjeto.length; i++) {
+    //     point(matrizFinal.get([0, i]), matrizFinal.get([1, i]));
+    // }
+
+    for (let i = 0; i < faces.length; i++)
+    {
+        const idx_pt1 = faces[i][0] - 1;
+        const idx_pt2 = faces[i][1] - 1;
+        const idx_pt3 = faces[i][2] - 1;
+
+        line(matrizFinal.get([0,idx_pt1]), matrizFinal.get([1,idx_pt1]),
+             matrizFinal.get([0,idx_pt2]), matrizFinal.get([1, idx_pt2]));
+
+        line(matrizFinal.get([0,idx_pt1]), matrizFinal.get([1,idx_pt1]),
+        matrizFinal.get([0,idx_pt3]), matrizFinal.get([1, idx_pt3]));
+
+        line(matrizFinal.get([0,idx_pt3]), matrizFinal.get([1,idx_pt3]),
+             matrizFinal.get([0,idx_pt2]), matrizFinal.get([1, idx_pt2]));
     }
 
     flagDesenhar = false;
