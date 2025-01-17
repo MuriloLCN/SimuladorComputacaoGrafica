@@ -106,21 +106,21 @@ function carregarDadosDoPlano()
 }
 
 function calcularVetorNormalAoPlano() {
-    let u = plano[0];
-    let v = plano[1];
-    let w = plano[2];
+    let p1 = plano[0];
+    let p2 = plano[1];
+    let p3 = plano[2];
 
-    let x_12 = v[0] - u[0];
-    let y_12 = v[1] - u[1];
-    let z_12 = v[2] - u[2];
+    let x1x2 = p1[0] - p2[0];
+    let y1y2 = p1[1] - p2[1];
+    let z1z2 = p1[2] - p2[2];
 
-    let x_32 = w[0] - u[0];
-    let y_32 = w[1] - u[1];
-    let z_32 = w[2] - u[2];
+    let x3x2 = p3[0] - p2[0];
+    let y3y2 = p3[1] - p2[1];
+    let z3z2 = p3[2] - p2[2];
 
-    let nx = y_12 * z_32 - z_12 * y_32;
-    let ny = z_12 * x_32 - x_12 * z_32;
-    let nz = x_12 * y_32 - y_12 * x_32;
+    let nx = (y1y2 * z3z2) - (y3y2 * z1z2);
+    let ny = -((x1x2 * z3z2) - (x3x2 * z1z2));
+    let nz = (x1x2 * y3y2) - (x3x2 * y1y2);
 
     vetorNormalAoPlano = [nx, ny, nz];
 
@@ -153,7 +153,6 @@ function calcularD() {
         throw "Erro: Falha no cálculo de D.";
     }
 }
-
 
 function calcularMatrizPerspectiva() {
     if (d === undefined || vetorNormalAoPlano.length === 0 || pontoDeVista.length === 0) {
@@ -195,6 +194,7 @@ function calcularTransformacaoViewport() {
         matrizFinal.set([1, col], yScreen);
     }
 }
+
 
 // Função do p5.js
 function setup() {
