@@ -343,6 +343,10 @@ function draw() {
     {
         // Linhas
         // Apenas triângulos por hora
+
+        const linhasDesenhadas = new Map();
+
+
         for (let i = 0; i < faces.length; i++)
         {
             const idx_pt1 = faces[i][0] - 1;
@@ -353,39 +357,32 @@ function draw() {
             const [x2, y2, z2] = [matrizFinal.get([0,idx_pt2]), matrizFinal.get([1,idx_pt2]), matrizFinal.get([2,idx_pt2])];
             const [x3, y3, z3] = [matrizFinal.get([0,idx_pt3]), matrizFinal.get([1,idx_pt3]), matrizFinal.get([2,idx_pt3])];
             
-            // let p1_na_tela = false;
-            // let p2_na_tela = false;
-            // let p3_na_tela = false;
+           
+            const criarChaveLinha = (idx1, idx2) => {
+                return [Math.min(idx1, idx2), Math.max(idx1, idx2)].join("-");
+            };
 
-            // if (x1 > 0 && x1 < windowWidth && y1 > 0 && y1 < windowHeight)
-            // {
-            //     p1_na_tela = true;
-            // }
-
-            // if (x2 > 0 && x2 < windowWidth && y2 > 0 && y2 < windowHeight)
-            // {
-            //     p2_na_tela = true;
-            // }
-
-            // if (x3 > 0 && x3 < windowWidth && y3 > 0 && y3 < windowHeight)
-            // {
-            //     p3_na_tela = true;
-            // }
-
-            // if (p1_na_tela && p2_na_tela)
-            // {
+            const chave12 = criarChaveLinha(idx_pt1, idx_pt2);
+            if (!linhasDesenhadas.has(chave12)) {
                 line(x1, y1, x2, y2);
-            // }
+                linhasDesenhadas.set(chave12, true);
+            }
 
-            // if (p1_na_tela && p3_na_tela)
-            // {
+            const chave13 = criarChaveLinha(idx_pt1, idx_pt3);
+            if (!linhasDesenhadas.has(chave13)) {
                 line(x1, y1, x3, y3);
-            // }
+                linhasDesenhadas.set(chave13, true);
+            }
 
-            // if (p2_na_tela && p3_na_tela)
-            // {
+            const chave23 = criarChaveLinha(idx_pt2, idx_pt3);
+            if (!linhasDesenhadas.has(chave23)) {
                 line(x2, y2, x3, y3);
-            // }
+                linhasDesenhadas.set(chave23, true);
+            }
+            // line(x1, y1, x2, y2);
+            // line(x1, y1, x3, y3);
+            // line(x2, y2, x3, y3);
+
         }        
     }
     else {
@@ -443,6 +440,40 @@ document.getElementById("limpar-modelo").addEventListener("click", () => {
     matrizFinal = [];
     flagDesenhar = true;
 })
+
+document.getElementById("normalizar-objeto").addEventListener("click", () => {
+    let minX = Infinity, minY = Infinity, minZ = Infinity;
+    let maxX = -Infinity, maxY = -Infinity, maxZ = -Infinity;
+    
+    for (let i = 0; i < matrizDoObjeto.length; i++) {
+        let x = matrizDoObjeto[i][0];
+        let y = matrizDoObjeto[i][1];
+        let z = matrizDoObjeto[i][2];
+
+        minX = Math.min(minX, x);
+        minY = Math.min(minY, y);
+        minZ = Math.min(minZ, z);
+
+        maxX = Math.max(maxX, x);
+        maxY = Math.max(maxY, y);
+        maxZ = Math.max(maxZ, z);
+    }
+    
+    for (let i = 0; i < matrizDoObjeto.length; i++) {
+        let x = matrizDoObjeto[i][0];
+        let y = matrizDoObjeto[i][1];
+        let z = matrizDoObjeto[i][2];
+
+        let normalizedX = (x - minX) / (maxX - minX);
+        let normalizedY = (y - minY) / (maxY - minY);
+        let normalizedZ = (z - minZ) / (maxZ - minZ);
+
+        matrizDoObjeto[i][0] = normalizedX;
+        matrizDoObjeto[i][1] = normalizedY;
+        matrizDoObjeto[i][2] = normalizedZ;
+    }
+});
+
 
 // Entrada de arquivo 3D
 document.getElementById("file-input").addEventListener("change", async (event) => {
