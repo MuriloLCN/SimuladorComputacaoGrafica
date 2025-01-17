@@ -26,6 +26,15 @@ let matrizFinal = [];
 
 let tipoDesenho = 2;
 
+function atualizarDadosSim()
+{
+    document.getElementById("ponto-de-vista").innerHTML = "Ponto de vista: " + pontoDeVista.toString();
+    document.getElementById("plano").innerHTML = "Plano: " + plano.toString();
+    document.getElementById("valores-d").innerHTML = "D: " + d.toString() + " D0: " + d0.toString();
+    document.getElementById("vetor-normal").innerHTML = "Vetor normal: " + vetorNormalAoPlano.toString();
+    document.getElementById("matriz-perspectiva").innerHTML = "Matriz perspectiva: " + matrizPerspectiva.toString();
+}
+
 function buscarTipoDesenho()
 {
     tipoDesenho = document.getElementById("tipo-desenho").value;
@@ -101,36 +110,57 @@ function calcularVetorNormalAoPlano() {
     let v = plano[1];
     let w = plano[2];
 
-    let x_12 = u[0] - v[0];
-    let y_12 = u[1] - v[1];
-    let z_12 = u[2] - v[2];
+    let x_12 = v[0] - u[0];
+    let y_12 = v[1] - u[1];
+    let z_12 = v[2] - u[2];
 
-    let x_32 = w[0] - v[0];
-    let y_32 = w[1] - v[1];
-    let z_32 = w[2] - v[2];
+    let x_32 = w[0] - u[0];
+    let y_32 = w[1] - u[1];
+    let z_32 = w[2] - u[2];
 
     let nx = y_12 * z_32 - z_12 * y_32;
     let ny = z_12 * x_32 - x_12 * z_32;
     let nz = x_12 * y_32 - y_12 * x_32;
 
     vetorNormalAoPlano = [nx, ny, nz];
+
+    if (nx === 0 && ny === 0 && nz === 0) {
+        alert("Erro: O plano não é válido (vetor normal nulo).");
+        throw "Erro: Vetor normal ao plano é nulo.";
+    }
 }
 
 function calcularD() {
+    if (plano.length === 0 || vetorNormalAoPlano.length === 0 || pontoDeVista.length === 0) {
+        alert("Erro: Dados insuficientes para calcular D.");
+        throw "Erro: Dados insuficientes para calcular D.";
+    }
+
     let pontoPertencenteAoPlano = plano[0];
+    let [nx, ny, nz] = vetorNormalAoPlano;
+    let [px, py, pz] = pontoPertencenteAoPlano;
+    let [vx, vy, vz] = pontoDeVista;
 
-    d0 = pontoPertencenteAoPlano[0] * vetorNormalAoPlano[0] +
-         pontoPertencenteAoPlano[1] * vetorNormalAoPlano[1] +
-         pontoPertencenteAoPlano[2] * vetorNormalAoPlano[2];
+    d0 = nx * px + ny * py + nz * pz;
 
-    let d1 = pontoDeVista[0] * vetorNormalAoPlano[0] +
-             pontoDeVista[1] * vetorNormalAoPlano[1] +
-             pontoDeVista[2] * vetorNormalAoPlano[2];
+    let d1 = nx * vx + ny * vy + nz * vz;
 
     d = d0 - d1;
+
+    // Validate values
+    if (isNaN(d0) || isNaN(d)) {
+        alert("Erro: Valores de D inválidos.");
+        throw "Erro: Falha no cálculo de D.";
+    }
 }
 
+
 function calcularMatrizPerspectiva() {
+    if (d === undefined || vetorNormalAoPlano.length === 0 || pontoDeVista.length === 0) {
+        alert("Erro: Dados insuficientes para calcular a matriz de perspectiva.");
+        throw "Erro: Dados insuficientes para a matriz de perspectiva.";
+    }
+
     let [a, b, c] = pontoDeVista;
     let [nx, ny, nz] = vetorNormalAoPlano;
 
@@ -138,7 +168,7 @@ function calcularMatrizPerspectiva() {
         [d + a * nx, a * ny, a * nz, -a * d0],
         [b * nx, d + b * ny, b * nz, -b * d0],
         [c * nx, c * ny, d + c * nz, -c * d0],
-        [nx, ny, nz, 1],
+        [nx, ny, nz, d],
     ];
 }
 
@@ -289,6 +319,8 @@ function draw() {
 
     calcularTransformacaoViewport();
 
+    atualizarDadosSim();
+
     if (tipoDesenho == 0)
     {
         // Pontos
@@ -321,39 +353,39 @@ function draw() {
             const [x2, y2, z2] = [matrizFinal.get([0,idx_pt2]), matrizFinal.get([1,idx_pt2]), matrizFinal.get([2,idx_pt2])];
             const [x3, y3, z3] = [matrizFinal.get([0,idx_pt3]), matrizFinal.get([1,idx_pt3]), matrizFinal.get([2,idx_pt3])];
             
-            let p1_na_tela = false;
-            let p2_na_tela = false;
-            let p3_na_tela = false;
+            // let p1_na_tela = false;
+            // let p2_na_tela = false;
+            // let p3_na_tela = false;
 
-            if (x1 > 0 && x1 < windowWidth && y1 > 0 && y1 < windowHeight)
-            {
-                p1_na_tela = true;
-            }
+            // if (x1 > 0 && x1 < windowWidth && y1 > 0 && y1 < windowHeight)
+            // {
+            //     p1_na_tela = true;
+            // }
 
-            if (x2 > 0 && x2 < windowWidth && y2 > 0 && y2 < windowHeight)
-            {
-                p2_na_tela = true;
-            }
+            // if (x2 > 0 && x2 < windowWidth && y2 > 0 && y2 < windowHeight)
+            // {
+            //     p2_na_tela = true;
+            // }
 
-            if (x3 > 0 && x3 < windowWidth && y3 > 0 && y3 < windowHeight)
-            {
-                p3_na_tela = true;
-            }
+            // if (x3 > 0 && x3 < windowWidth && y3 > 0 && y3 < windowHeight)
+            // {
+            //     p3_na_tela = true;
+            // }
 
-            if (p1_na_tela && p2_na_tela)
-            {
+            // if (p1_na_tela && p2_na_tela)
+            // {
                 line(x1, y1, x2, y2);
-            }
+            // }
 
-            if (p1_na_tela && p3_na_tela)
-            {
+            // if (p1_na_tela && p3_na_tela)
+            // {
                 line(x1, y1, x3, y3);
-            }
+            // }
 
-            if (p2_na_tela && p3_na_tela)
-            {
+            // if (p2_na_tela && p3_na_tela)
+            // {
                 line(x2, y2, x3, y3);
-            }
+            // }
         }        
     }
     else {
@@ -364,10 +396,10 @@ function draw() {
                 const x = matrizFinal.get([0, idx - 1]);
                 const y = matrizFinal.get([1, idx - 1]);
 
-                if (x < 0 || x > windowWidth || y < 0 || y > windowHeight)
-                {
-                    continue;
-                }
+                // if (x < 0 || x > windowWidth || y < 0 || y > windowHeight)
+                // {
+                //     continue;
+                // }
                 vertex(x, y);
             }
             endShape(CLOSE);
