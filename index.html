@@ -3,101 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Visualizador 3D</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="style.css">
+    <title>Simulador 3D</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+        }
+        .hero-section {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            padding: 100px 15px;
+            text-align: center;
+        }
+        .features-section {
+            padding: 50px 15px;
+        }
+        .btn-simulate {
+            background: #007bff;
+            color: white;
+            border: none;
+        }
+        .btn-simulate:hover {
+            background: #0056b3;
+        }
+        footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            margin-top: 50px;
+        }
+    </style>
 </head>
-<body class="d-flex">
-    <nav class="bg-light p-3" id="sidebar" style="width: 25%; height: 100vh; overflow-y: auto; word-wrap: break-word;">
-        <h2 class="text-center">Configurações</h2>
-        
-        <div class="mb-3">
-            <label for="file-input" class="form-label">Arquivo do Objeto 3D:</label>
-            <input type="file" id="file-input" class="form-control">
-        </div>
+<body>
+    <section class="hero-section">
+        <h1 class="display-4">Simulador 3D</h1>
+        <p class="lead">Trabalho avaliativo da disciplina de Computação Gráfica</p>
+        <p>Alunos: <strong>Leandro Eugênio Farias Berton</strong> e <strong>Murilo Luis Calvo Neves</strong></p>
+        <p>Professor: <strong>Dante Alves Medeiros Filho</strong></p>
 
-        <fieldset class="mb-3">
-            <legend>Ponto de Vista</legend>
-            <div class="row">
-                <div class="col-4">
-                    <label for="viewpoint-x" class="form-label">X</label>
-                    <input type="number" id="viewpoint-x" class="form-control">
-                </div>
-                <div class="col-4">
-                    <label for="viewpoint-y" class="form-label">Y</label>
-                    <input type="number" id="viewpoint-y" class="form-control">
-                </div>
-                <div class="col-4">
-                    <label for="viewpoint-z" class="form-label">Z</label>
-                    <input type="number" id="viewpoint-z" class="form-control">
-                </div>
+    </section>
+
+    <section id="instructions" class="bg-light py-5">
+        <div class="container">
+            <h2 class="text-center mb-4">Como executar o simulador</h2>
+            <ol class="list-group list-group-numbered">
+                <li class="list-group-item">Acesse o simulador com o botão abaixo</li>
+                <li class="list-group-item">Escolha um arquivo 3D .obj de sua escolha (alguns exemplos já estão no repositório deste trabalho)</li>
+                <li class="list-group-item">Para uma melhor experiência, aperte o botão "Normalizar Objeto" para evitar objetos gigantes</li>
+                <li class="list-group-item">Escolha o ponto de vista e o plano de visualização</li>
+                <li class="list-group-item">Carregue os dados para o simulador</li>
+                <li class="list-group-item">Inicie a simulação</li>
+                <li class="list-group-item">Para controlar a simulação, utilize o <strong>mouse</strong> para arrastar o objeto, o <strong>scroll wheel</strong> para alterar o ponto de vista e <strong>mouse + espaço</strong> para rotacionar o objeto</li>
+            </ol>
+            <div class="text-center mt-4">
+                <a href="simulador.html" class="btn btn-simulate btn-lg">Abrir o Simulador</a>
             </div>
-        </fieldset>
-
-        <fieldset class="mb-3">
-            <legend>Plano de Projeção</legend>
-            <label for="plano-u" class="form-label">U (X, Y, Z)</label>
-            <input type="text" id="plano-u" class="form-control" placeholder="ex.: 1, 0, 0">
-            <label for="plano-v" class="form-label mt-2">V (X, Y, Z)</label>
-            <input type="text" id="plano-v" class="form-control" placeholder="ex.: 0, 1, 0">
-            <label for="plano-w" class="form-label mt-2">W (X, Y, Z)</label>
-            <input type="text" id="plano-w" class="form-control" placeholder="ex.: 0, 0, 1">
-        </fieldset>
-
-        <fieldset class="mb-3">
-            <legend>Tipo de desenho</legend>
-            <select id="tipo-desenho" class="form-select">
-                <option value="0">Pontos</option>
-                <option value="1">Linhas</option>
-                <option value="2">Formas</option>
-            </select>
-        </fieldset>
-
-        <button type="button" id="executar" class="btn btn-primary w-100" disabled>Executar</button>
-        <button type="button" id="pausar" class="btn btn-danger w-100" disabled>Pausar</button>
-        <button type="button" id="carregar" class="btn btn-success w-100">Carregar dados</button>
-        
-
-        <hr>
-
-        <h3 class="text-center">Controles</h3>
-
-        Espaço + Mexer o mouse = Rotacionar a tela
-
-        <br>
-
-        Roda do mouse = Zoom
-
-        <br>
-
-        Clicar e arrastar = Mover o objeto
-
-        <button type="button" id="limpar-modelo" class="btn btn-warning w-100"> Limpar modelo </button>
-
-        <button type="button" id="normalizar-objeto" class="btn btn-info w-100"> Normalizar objeto </button>
-
-        <h3 class="text-center">Dados simulação</h3>
-
-        <p id="ponto-de-vista"></p>
-
-        <p id="plano"></p>
-
-        <p id="valores-d"></p>
-
-        <p id="vetor-normal"></p>
-
-        <p id="matriz-perspectiva"></p>
-        
-    </nav>
-
-    <div class="flex-grow-1 d-flex align-items-center justify-content-center bg-dark" id="main-content", style="width: 75%;">
-        <div id="canvas-container" style="width: 90%; height: 90%;">
-            <!-- Canva P5.js -->
         </div>
-    </div>
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mathjs@14.0.1/lib/browser/math.min.js"></script>
-    <script src="script.js"></script>
+    </section>
+
+    <footer>
+        <small class="text-muted">Desenvolvido com ❤️ por Leandro E. F. Berton e Murilo L. C. Neves</small>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

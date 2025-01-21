@@ -1,0 +1,49 @@
+Para executar: Como o projeto foi feito em JS, basta apenas abrir o 
+index.html em um navegador que suporte javascript e ele contém mais 
+instruções.
+
+Para executar o simulador você precisa de um arquivo .obj,
+nós deixamos alguns exemplos na pasta '/modelos'. Uma observação importante
+é que, como eles têm escalas diferentes de tamanho uns dos outros, nós
+adicionamos um botão de normalizar o objeto, então é recomendado apertá-lo
+antes de executar a simulação para ser uma experiência mais agradável.
+
+A página de simulação é o 'simulador.html'. No lado direito da página
+tem o canvas no qual o desenho ocorre. No lado esquerdo estão os controles.
+
+O ponto de vista são três números, e o plano de projeção são três trincas,
+por exemplo, (1,0,0),(0,1,0),(0,0,0). No próprio input já tem um exemplo 
+mostrando o tipo de entrada esperada.
+
+Nós montamos três tipos de desenho:
+* Pontos: Aqui só são mostrados os vértices do objeto. É ideal para
+objetos muito grandes e pesados, com uma grande quantidade de vértices, pois
+permite ver bem o objeto ao mesmo tempo que é bem mais leve do que os outros
+tipos de desenho.
+
+* Linhas: Aqui são desenhadas as linhas que conectam os vértices de cada face.
+Esse tipo de desenho é mais pesado do que o de pontos, então não é recomendado
+para objetos muito pesados, mas ajuda bastante a ver objetos mais simples,
+como o cubo.
+
+* Faces: É um tipo experimental que também preenche as faces usando uma função
+do p5.js. Não é tão bom por ser mais pesado do que as linhas e não ter uma
+checagem para ver quais faces não deveriam estar visíveis por outras estarem
+"na frente", mas é interessante por preencher as formas.
+
+Os controles possuem uma descrição na página, mas são bem simples. São três:
+
+* Apertar espaço + mexer o mouse: Isso rotaciona o objeto
+
+* Clicar e arrastar: Isso translada o objeto
+
+* Roda do mouse: Isso adiciona/remove uma pequena quantia do X, Y e Z do ponto de
+vista. Originalmente era para servir como um 'zoom' mas não foi tão simples
+controlar a visualização como inicialmente tinhamos previsto.
+
+E por fim, ao final, tem uma seção "Dados Simulação", que, quando a simulação
+é iniciada, alguns valores são colocados lá. Utilizado mais para debug.
+
+Com muito carinho,
+- Leandro E. F. Berton
+- Murilo L. C. Neves

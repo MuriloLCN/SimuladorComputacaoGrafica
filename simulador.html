@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualizador 3D</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="d-flex">
+    <nav class="bg-light p-3" id="sidebar" style="width: 25%; height: 100vh; overflow-y: auto; word-wrap: break-word;">
+        <h2 class="text-center">Configurações</h2>
+        
+        <div class="mb-3">
+            <label for="file-input" class="form-label">Arquivo do Objeto 3D:</label>
+            <input type="file" id="file-input" class="form-control">
+        </div>
+
+        <fieldset class="mb-3">
+            <legend>Ponto de Vista</legend>
+            <div class="row">
+                <div class="col-4">
+                    <label for="viewpoint-x" class="form-label">X</label>
+                    <input type="number" id="viewpoint-x" class="form-control">
+                </div>
+                <div class="col-4">
+                    <label for="viewpoint-y" class="form-label">Y</label>
+                    <input type="number" id="viewpoint-y" class="form-control">
+                </div>
+                <div class="col-4">
+                    <label for="viewpoint-z" class="form-label">Z</label>
+                    <input type="number" id="viewpoint-z" class="form-control">
+                </div>
+            </div>
+        </fieldset>
+
+        <fieldset class="mb-3">
+            <legend>Plano de Projeção</legend>
+            <label for="plano-u" class="form-label">U (X, Y, Z)</label>
+            <input type="text" id="plano-u" class="form-control" placeholder="ex.: 1, 0, 0">
+            <label for="plano-v" class="form-label mt-2">V (X, Y, Z)</label>
+            <input type="text" id="plano-v" class="form-control" placeholder="ex.: 0, 1, 0">
+            <label for="plano-w" class="form-label mt-2">W (X, Y, Z)</label>
+            <input type="text" id="plano-w" class="form-control" placeholder="ex.: 0, 0, 1">
+        </fieldset>
+
+        <fieldset class="mb-3">
+            <legend>Tipo de desenho</legend>
+            <select id="tipo-desenho" class="form-select">
+                <option value="0">Pontos</option>
+                <option value="1">Linhas</option>
+                <option value="2">Formas</option>
+            </select>
+        </fieldset>
+
+        <button type="button" id="executar" class="btn btn-primary w-100" disabled>Executar</button>
+        <button type="button" id="pausar" class="btn btn-danger w-100" disabled>Pausar</button>
+        <button type="button" id="carregar" class="btn btn-success w-100">Carregar dados</button>
+        
+
+        <hr>
+
+        <h3 class="text-center">Controles</h3>
+
+        Espaço + Mexer o mouse = Rotacionar o objeto
+
+        <br>
+
+        Roda do mouse = Mexer o ponto de vista
+
+        <br>
+
+        Clicar e arrastar = Mover o objeto
+
+        <button type="button" id="normalizar-objeto" class="btn btn-info w-100"> Normalizar objeto </button>
+
+        <hr> 
+
+        <h3 class="text-center">Dados simulação</h3>
+
+        <p id="ponto-de-vista"></p>
+
+        <p id="plano"></p>
+
+        <p id="valores-d"></p>
+
+        <p id="vetor-normal"></p>
+
+        <p id="matriz-perspectiva"></p>
+        
+    </nav>
+
+    <div class="flex-grow-1 d-flex align-items-center justify-content-center bg-dark" id="main-content", style="width: 75%;">
+        <div id="canvas-container" style="width: 90%; height: 90%;">
+            <!-- Canva P5.js -->
+        </div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjs@14.0.1/lib/browser/math.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

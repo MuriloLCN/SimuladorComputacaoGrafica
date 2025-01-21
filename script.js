@@ -435,12 +435,6 @@ document.getElementById("pausar").addEventListener("click", () => {
     flagExecutando = false;
 });
 
-document.getElementById("limpar-modelo").addEventListener("click", () => {
-    matrizDoObjeto = [];
-    matrizFinal = [];
-    flagDesenhar = true;
-})
-
 document.getElementById("normalizar-objeto").addEventListener("click", () => {
     let minX = Infinity, minY = Infinity, minZ = Infinity;
     let maxX = -Infinity, maxY = -Infinity, maxZ = -Infinity;
