@@ -24,7 +24,10 @@ tipos de desenho.
 * Linhas: Aqui são desenhadas as linhas que conectam os vértices de cada face.
 Esse tipo de desenho é mais pesado do que o de pontos, então não é recomendado
 para objetos muito pesados, mas ajuda bastante a ver objetos mais simples,
-como o cubo.
+como o cubo. Um ponto importante é que esse tipo de desenho assume que todas as
+faces são feitas por triângulos - o que é o padrão em .obj. Caso seja necessário
+desenhar uma face cujo número de vértices seja 4 ou mais, utilize o desenho por
+faces.
 
 * Faces: É um tipo experimental que também preenche as faces usando uma função
 do p5.js. Não é tão bom por ser mais pesado do que as linhas e não ter uma
