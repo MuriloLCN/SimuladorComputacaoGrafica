@@ -453,14 +453,20 @@ document.getElementById("normalizar-objeto").addEventListener("click", () => {
         maxZ = Math.max(maxZ, z);
     }
     
+    let width = maxX - minX;
+    let height = maxY - minY;
+    let depth = maxZ - minZ;
+
+    let maxDimension = Math.max(width, height, depth);
+    
     for (let i = 0; i < matrizDoObjeto.length; i++) {
         let x = matrizDoObjeto[i][0];
         let y = matrizDoObjeto[i][1];
         let z = matrizDoObjeto[i][2];
 
-        let normalizedX = (x - minX) / (maxX - minX);
-        let normalizedY = (y - minY) / (maxY - minY);
-        let normalizedZ = (z - minZ) / (maxZ - minZ);
+        let normalizedX = (x - minX) / maxDimension;
+        let normalizedY = (y - minY) / maxDimension;
+        let normalizedZ = (z - minZ) / maxDimension;
 
         matrizDoObjeto[i][0] = normalizedX;
         matrizDoObjeto[i][1] = normalizedY;
