@@ -40,9 +40,8 @@ Os controles possuem uma descrição na página, mas são bem simples. São trê
 
 * Clicar e arrastar: Isso translada o objeto
 
-* Roda do mouse: Isso adiciona/remove uma pequena quantia do X, Y e Z do ponto de
-vista. Originalmente era para servir como um 'zoom' mas não foi tão simples
-controlar a visualização como inicialmente tinhamos previsto.
+* Roda do mouse: Isso funciona como um 'zoom', alterando o tamanho da janela
+considerada na transformação para o viewport.
 
 E por fim, ao final, tem uma seção "Dados Simulação", que, quando a simulação
 é iniciada, alguns valores são colocados lá. Utilizado mais para debug.

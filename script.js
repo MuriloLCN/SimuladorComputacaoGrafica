@@ -21,6 +21,15 @@ let dragStartY = 0;
 let translateX = 0;
 let translateY = 0;
 
+let uMin = -1;
+let uMax = 1;
+let vMin = -1;
+let vMax = 1;
+    // const uMin = -1;
+    // const uMax = 1;
+    // const vMin = -1;
+    // const vMax = 1;
+
 let matrizPerspectiva = [];
 let matrizFinal = [];
 
@@ -175,10 +184,10 @@ function calcularTransformacaoViewport() {
     const larguraViewport = width;
     const alturaViewport = height;
 
-    const uMin = -1;
-    const uMax = 1;
-    const vMin = -1;
-    const vMax = 1;
+    // const uMin = -1;
+    // const uMax = 1;
+    // const vMin = -1;
+    // const vMax = 1;
 
     const scaleX = larguraViewport / (uMax - uMin);
     const scaleY = alturaViewport / (vMax - vMin);
@@ -244,28 +253,27 @@ function mouseDragged() {
 
 // Função do p5.js
 function mouseWheel(event) {
+    // Ajusta o zoom dinamicamente
     let velocidadeZoom = 0.05;
-    let newX;
-    let newY;
-    let newZ;
-
+    
     if (event.delta > 0)
     {
-        newX = pontoDeVista[0] - velocidadeZoom;
-        newY = pontoDeVista[1] - velocidadeZoom;
-        newZ = pontoDeVista[2] - velocidadeZoom;
+        uMin -= velocidadeZoom;
+        vMin -= velocidadeZoom;
+        uMax += velocidadeZoom;
+        vMax += velocidadeZoom;
     }
-    else
+    else 
     {
-        newX = pontoDeVista[0] + velocidadeZoom;
-        newY = pontoDeVista[1] + velocidadeZoom;
-        newZ = pontoDeVista[2] + velocidadeZoom;
+        uMin += velocidadeZoom;
+        vMin += velocidadeZoom;
+        uMax -= velocidadeZoom;
+        vMax -= velocidadeZoom;    
     }
-    
-    pontoDeVista[0] = newX;
-    pontoDeVista[1] = newY;
-    pontoDeVista[2] = newZ;
+
     flagDesenhar = true;
+
+    return false; // Previne scroll padrão da página
 }
 
 // Função do p5.js
