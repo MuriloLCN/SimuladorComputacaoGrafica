@@ -305,9 +305,9 @@ function draw() {
         [0, 0, 0, 1],
     ];
 
-    // Combine transformations: translation -> rotation -> object
+    // Faz a combinação das transformações: translação -> rotação -> objeto
     let matrizTransformada = math.matrix(matrizDoObjeto);
-    matrizTransformada = math.transpose(matrizTransformada); // Ensure correct orientation
+    matrizTransformada = math.transpose(matrizTransformada);
     matrizTransformada = math.multiply(matrizTranslacao, math.multiply(matrizRotacaoY, math.multiply(matrizRotacaoX, matrizTransformada)));
 
     calcularVetorNormalAoPlano();
@@ -316,6 +316,8 @@ function draw() {
 
     matrizFinal = math.multiply(math.matrix(matrizPerspectiva), matrizTransformada);
 
+    // Normalização da coordenada homogênea após a projeção em perspectiva
+    // Percorre cada coluna da matriz matrizFinal e divide todos os elementos dessa coluna pelo valor da quarta coordenada w
     for (let col = 0; col < matrizFinal.size()[1]; col++) {
         const w = matrizFinal.get([3, col]);
         if (w !== 0) {
