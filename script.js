@@ -204,6 +204,35 @@ function calcularTransformacaoViewport() {
     }
 }
 
+// Calcula coordenadas UV normalizadas a partir dos pontos do objeto
+// Encontra os valores mínimos e máximos de x e y na matrizDoObjeto, calcula uma região quadrada que envolve o objeto e define os limites iniciais das coordenadas u e v
+function calcularUVIniciais() {
+    let minX = Infinity, minY = Infinity;
+    let maxX = -Infinity, maxY = -Infinity;
+    for (let i = 0; i < matrizDoObjeto.length; i++) {
+        let x = matrizDoObjeto[i][0];
+        let y = matrizDoObjeto[i][1];
+        minX = Math.min(minX, x);
+        minY = Math.min(minY, y);
+        maxX = Math.max(maxX, x);
+        maxY = Math.max(maxY, y);
+    }
+    let width = maxX - minX;
+    let height = maxY - minY;
+    let maxDim = Math.max(width, height);
+    let cX = (maxX + minX) / 2;
+    let cY = (maxY + minY) / 2;
+    uMin = cX - maxDim / 2;
+    uMax = cX + maxDim / 2;
+    vMin = cY - maxDim / 2;
+    vMax = cY + maxDim / 2;
+    let min = Math.min(uMin, vMin) * 1.2;
+    let max = Math.max(uMax, vMax) * 1.2;
+    uMin = min;
+    vMin = min;
+    uMax = max;
+    vMax = max;
+}
 
 // Função do p5.js
 function setup() {
@@ -427,6 +456,7 @@ document.getElementById("executar").addEventListener("click", () => {
     }
     flagExecutando = true;
     flagDesenhar = true;
+    calcularUVIniciais();
 });
 
 document.getElementById("carregar").addEventListener("click", () => {
