@@ -1,475 +1,245 @@
 let flagExecutando = false;
-let flagDesenhar = true;
-
-let dadosModelo3D = null;
 
 let matrizDoObjeto = [];
 let faces = [];
 
-let plano = [];
-let vetorNormalAoPlano = [];
-let pontoDeVista = [];
+let camPos = [0, 0, 5];
+let camYaw = -Math.PI / 2;
+let camPitch = 0;
+let fov = Math.PI / 3;
+let zNear = 0.1;
+let zFar = 1000.0;
 
-let d; // Variável utilizada na fórmula, tem esse nome mesmo
-let d0;
-
-let rotX = 0;
-let rotY = 0;
-
-let dragStartX = 0;
-let dragStartY = 0;
-let translateX = 0;
-let translateY = 0;
-
-let uMin = -1;
-let uMax = 1;
-let vMin = -1;
-let vMax = 1;
-    // const uMin = -1;
-    // const uMax = 1;
-    // const vMin = -1;
-    // const vMax = 1;
-
-let matrizPerspectiva = [];
-let matrizFinal = [];
+let mouseSensibilidade = 0.002;
+let velocidadeMovimento = 0.1;
 
 let tipoDesenho = 2;
 
-function atualizarDadosSim()
-{
-    document.getElementById("ponto-de-vista").innerHTML = "Ponto de vista: " + pontoDeVista.toString();
-    document.getElementById("plano").innerHTML = "Plano: " + plano.toString();
-    document.getElementById("valores-d").innerHTML = "D: " + d.toString() + " D0: " + d0.toString();
-    document.getElementById("vetor-normal").innerHTML = "Vetor normal: " + vetorNormalAoPlano.toString();
-    document.getElementById("matriz-perspectiva").innerHTML = "Matriz perspectiva: " + matrizPerspectiva.toString();
-}
-
-function buscarTipoDesenho()
-{
-    tipoDesenho = document.getElementById("tipo-desenho").value;
-}
-
-function carregarPontoDeVista()
-{
-    let pov_x = parseFloat(document.getElementById("viewpoint-x").value);
-    let pov_y = parseFloat(document.getElementById("viewpoint-y").value);
-    let pov_z = parseFloat(document.getElementById("viewpoint-z").value);
-
-    if (isNaN(pov_x) || isNaN(pov_y) || isNaN(pov_z))
-    {
-        alert("Ponto de vista inválido");
-        throw "Ponto de vista inválido";
-    }
-
-    pontoDeVista = [pov_x, pov_y, pov_z];
-}
-
-function carregarDadosDoPlano()
-{
-    let string_u = document.getElementById("plano-u").value;
-    let string_v = document.getElementById("plano-v").value;
-    let string_w = document.getElementById("plano-w").value;
-
-    let u = string_u.split(",");
-    let v = string_v.split(",");
-    let w = string_w.split(",");
-
-    if (u.length != 3 || v.length != 3 || w.length != 3)
-    {
-        alert("Número de argumentos do plano inválidos, tente novamente");
-        throw "Número de argumentos do plano inválidos, tente novamente";
-            
-    }
-
-    u = u.map((valor) => {
-        let t = parseFloat(valor);
-        if (isNaN(t))
-        {
-            alert("Argumentos do plano inválidos, tente novamente");
-            throw "Argumentos do plano inválidos, tente novamente";
-        }
-        return parseFloat(valor);
-    })
-
-    v = v.map((valor) => {
-        let t = parseFloat(valor);
-        if (isNaN(t))
-        {
-            alert("Argumentos do plano inválidos, tente novamente");
-            throw "Argumentos do plano inválidos, tente novamente";
-        }
-        return parseInt(valor);
-    })
-
-    w = w.map((valor) => {
-        let t = parseFloat(valor);
-        if (isNaN(t))
-        {
-            alert("Argumentos do plano inválidos, tente novamente");
-            throw "Argumentos do plano inválidos, tente novamente";
-        }
-        return parseFloat(valor);
-    })
-
-    plano = [u, v, w];
-}
-
-function calcularVetorNormalAoPlano() {
-    let p1 = plano[0];
-    let p2 = plano[1];
-    let p3 = plano[2];
-
-    let x1x2 = p1[0] - p2[0];
-    let y1y2 = p1[1] - p2[1];
-    let z1z2 = p1[2] - p2[2];
-
-    let x3x2 = p3[0] - p2[0];
-    let y3y2 = p3[1] - p2[1];
-    let z3z2 = p3[2] - p2[2];
-
-    let nx = (y1y2 * z3z2) - (y3y2 * z1z2);
-    let ny = -((x1x2 * z3z2) - (x3x2 * z1z2));
-    let nz = (x1x2 * y3y2) - (x3x2 * y1y2);
-
-    vetorNormalAoPlano = [nx, ny, nz];
-
-    if (nx === 0 && ny === 0 && nz === 0) {
-        alert("Erro: O plano não é válido (vetor normal nulo).");
-        throw "Erro: Vetor normal ao plano é nulo.";
-    }
-}
-
-function calcularD() {
-    if (plano.length === 0 || vetorNormalAoPlano.length === 0 || pontoDeVista.length === 0) {
-        alert("Erro: Dados insuficientes para calcular D.");
-        throw "Erro: Dados insuficientes para calcular D.";
-    }
-
-    let pontoPertencenteAoPlano = plano[0];
-    let [nx, ny, nz] = vetorNormalAoPlano;
-    let [px, py, pz] = pontoPertencenteAoPlano;
-    let [vx, vy, vz] = pontoDeVista;
-
-    d0 = nx * px + ny * py + nz * pz;
-
-    let d1 = nx * vx + ny * vy + nz * vz;
-
-    d = d0 - d1;
-
-    // Validate values
-    if (isNaN(d0) || isNaN(d)) {
-        alert("Erro: Valores de D inválidos.");
-        throw "Erro: Falha no cálculo de D.";
-    }
-}
-
-function calcularMatrizPerspectiva() {
-    if (d === undefined || vetorNormalAoPlano.length === 0 || pontoDeVista.length === 0) {
-        alert("Erro: Dados insuficientes para calcular a matriz de perspectiva.");
-        throw "Erro: Dados insuficientes para a matriz de perspectiva.";
-    }
-
-    let [a, b, c] = pontoDeVista;
-    let [nx, ny, nz] = vetorNormalAoPlano;
-
-    matrizPerspectiva = [
-        [d + a * nx, a * ny, a * nz, -a * d0],
-        [b * nx, d + b * ny, b * nz, -b * d0],
-        [c * nx, c * ny, d + c * nz, -c * d0],
-        [nx, ny, nz, d],
-    ];
-}
-
-function calcularTransformacaoViewport() {
-    const larguraViewport = width;
-    const alturaViewport = height;
-
-    // const uMin = -1;
-    // const uMax = 1;
-    // const vMin = -1;
-    // const vMax = 1;
-
-    const scaleX = larguraViewport / (uMax - uMin);
-    const scaleY = alturaViewport / (vMax - vMin);
-
-    for (let col = 0; col < matrizFinal.size()[1]; col++) {
-        const xNDC = matrizFinal.get([0, col]);
-        const yNDC = matrizFinal.get([1, col]);
-
-        const xScreen = scaleX * (xNDC - uMin);
-        const yScreen = alturaViewport - scaleY * (yNDC - vMin);
-
-        matrizFinal.set([0, col], xScreen);
-        matrizFinal.set([1, col], yScreen);
-    }
-}
-
-// Calcula coordenadas UV normalizadas a partir dos pontos do objeto
-// Encontra os valores mínimos e máximos de x e y na matrizDoObjeto, calcula uma região quadrada que envolve o objeto e define os limites iniciais das coordenadas u e v
-function calcularUVIniciais() {
-    let minX = Infinity, minY = Infinity;
-    let maxX = -Infinity, maxY = -Infinity;
-    for (let i = 0; i < matrizDoObjeto.length; i++) {
-        let x = matrizDoObjeto[i][0];
-        let y = matrizDoObjeto[i][1];
-        minX = Math.min(minX, x);
-        minY = Math.min(minY, y);
-        maxX = Math.max(maxX, x);
-        maxY = Math.max(maxY, y);
-    }
-    let width = maxX - minX;
-    let height = maxY - minY;
-    let maxDim = Math.max(width, height);
-    let cX = (maxX + minX) / 2;
-    let cY = (maxY + minY) / 2;
-    uMin = cX - maxDim / 2;
-    uMax = cX + maxDim / 2;
-    vMin = cY - maxDim / 2;
-    vMax = cY + maxDim / 2;
-    let min = Math.min(uMin, vMin) * 1.2;
-    let max = Math.max(uMax, vMax) * 1.2;
-    uMin = min;
-    vMin = min;
-    uMax = max;
-    vMax = max;
-}
-
-// Função do p5.js
 function setup() {
     let canvas = createCanvas(windowWidth * 0.67, windowHeight * 0.9);
     canvas.parent("canvas-container");
+    canvas.mousePressed(() => {
+        if (flagExecutando) {
+            requestPointerLock();
+        }
+    });
     frameRate(60);
 }
 
-// Função do p5.js
-function mouseMoved() {
-    
-    // movedX e Y são do p5.js
-
-    // Apenas alterar o ponto de vista se o espaço estiver apertado
-    if (keyIsDown(32) === true)
-    {
-        rotX += movedY * 0.01;
-        rotY += movedX * 0.01;
-        flagDesenhar = true;
-    }
-
+function windowResized() {
+    resizeCanvas(windowWidth * 0.67, windowHeight * 0.9);
 }
 
-// Função do p5.js
-function mousePressed() {
-    if (mouseButton === LEFT) {
-        dragStartX = mouseX;
-        dragStartY = mouseY;
+function processarEntradaTeclado() {
+    let cosYaw = Math.cos(camYaw);
+    let sinYaw = Math.sin(camYaw);
+
+    let frente = [cosYaw, 0, sinYaw];
+    let direita = [-sinYaw, 0, cosYaw];
+
+    if (keyIsDown(87)) { // W
+        camPos[0] += frente[0] * velocidadeMovimento;
+        camPos[2] += frente[2] * velocidadeMovimento;
     }
-}
-
-// Função do p5.js
-function mouseDragged() {
-    if (mouseButton === LEFT) {
-        let dragDeltaX = mouseX - dragStartX;
-        let dragDeltaY = mouseY - dragStartY;
-
-        translateX += dragDeltaX * 0.01;
-        translateY -= dragDeltaY * 0.01;
-
-        dragStartX = mouseX;
-        dragStartY = mouseY;
-
-        flagDesenhar = true;
+    if (keyIsDown(83)) { // S
+        camPos[0] -= frente[0] * velocidadeMovimento;
+        camPos[2] -= frente[2] * velocidadeMovimento;
+    }
+    if (keyIsDown(65)) { // A
+        camPos[0] -= direita[0] * velocidadeMovimento;
+        camPos[2] -= direita[2] * velocidadeMovimento;
+    }
+    if (keyIsDown(68)) { // D
+        camPos[0] += direita[0] * velocidadeMovimento;
+        camPos[2] += direita[2] * velocidadeMovimento;
+    }
+    if (keyIsDown(32)) { // Space
+        camPos[1] += velocidadeMovimento;
+    }
+    if (keyIsDown(16)) { // Shift
+        camPos[1] -= velocidadeMovimento;
     }
 }
 
-// Função do p5.js
+function mouseMoved(event) {
+    if (document.pointerLockElement) {
+        camYaw += event.movementX * mouseSensibilidade;
+        camPitch -= event.movementY * mouseSensibilidade;
+
+        const limitePitch = Math.PI / 2 - 0.01;
+        if (camPitch > limitePitch) camPitch = limitePitch;
+        if (camPitch < -limitePitch) camPitch = -limitePitch;
+    }
+}
+
 function mouseWheel(event) {
-    // Ajusta o zoom dinamicamente
-    let velocidadeZoom = 0.05;
-    
-    if (event.delta > 0)
-    {
-        uMin -= velocidadeZoom;
-        vMin -= velocidadeZoom;
-        uMax += velocidadeZoom;
-        vMax += velocidadeZoom;
+    if (event.delta > 0) {
+        velocidadeMovimento *= 1.1;
+    } else {
+        velocidadeMovimento *= 0.9;
     }
-    else 
-    {
-        uMin += velocidadeZoom;
-        vMin += velocidadeZoom;
-        uMax -= velocidadeZoom;
-        vMax -= velocidadeZoom;    
-    }
-
-    flagDesenhar = true;
-
-    return false; // Previne scroll padrão da página
+    return false;
 }
 
-// Função do p5.js
+function calcularMatrizVista() {
+    let cosPitch = Math.cos(camPitch);
+    let sinPitch = Math.sin(camPitch);
+    let cosYaw = Math.cos(camYaw);
+    let sinYaw = Math.sin(camYaw);
+
+    let forward = [cosPitch * cosYaw, sinPitch, cosPitch * sinYaw];
+    let upGlobal = [0, 1, 0];
+
+    let right = [
+        forward[1] * upGlobal[2] - forward[2] * upGlobal[1],
+        forward[2] * upGlobal[0] - forward[0] * upGlobal[2],
+        forward[0] * upGlobal[1] - forward[1] * upGlobal[0]
+    ];
+    let lenR = Math.hypot(right[0], right[1], right[2]);
+    if (lenR > 0) {
+        right = [right[0] / lenR, right[1] / lenR, right[2] / lenR];
+    }
+
+    let up = [
+        right[1] * forward[2] - right[2] * forward[1],
+        right[2] * forward[0] - right[0] * forward[2],
+        right[0] * forward[1] - right[1] * forward[0]
+    ];
+
+    let rot = [
+        [right[0], right[1], right[2], 0],
+        [up[0], up[1], up[2], 0],
+        [-forward[0], -forward[1], -forward[2], 0],
+        [0, 0, 0, 1]
+    ];
+
+    let trans = [
+        [1, 0, 0, -camPos[0]],
+        [0, 1, 0, -camPos[1]],
+        [0, 0, 1, -camPos[2]],
+        [0, 0, 0, 1]
+    ];
+
+    return math.multiply(rot, trans);
+}
+
+function calcularMatrizProjecao(aspecto) {
+    let tanHalfFov = Math.tan(fov / 2);
+    return [
+        [1 / (aspecto * tanHalfFov), 0, 0, 0],
+        [0, 1 / tanHalfFov, 0, 0],
+        [0, 0, -(zFar + zNear) / (zFar - zNear), -(2 * zFar * zNear) / (zFar - zNear)],
+        [0, 0, -1, 0]
+    ];
+}
+
+function atualizarDadosSim() {
+    let elemPov = document.getElementById("ponto-de-vista");
+    if (elemPov) elemPov.innerText = `Ponto de vista: [${camPos.map(v => v.toFixed(2)).join(", ")}]`;
+
+    let elemMat = document.getElementById("matriz-perspectiva");
+    if (elemMat) elemMat.innerText = `Orientação (Yaw/Pitch): ${camYaw.toFixed(2)} rad / ${camPitch.toFixed(2)} rad`;
+}
+
 function draw() {
-    if (!flagExecutando || !flagDesenhar) return;
+    if (!flagExecutando) return;
+
+    processarEntradaTeclado();
 
     background(0);
     stroke(255);
     fill(100);
 
-    const matrizTranslacao = [
-        [1, 0, 0, translateX],
-        [0, 1, 0, translateY],
-        [0, 0, 1, 0],
-        [0, 0, 0, 1],
-    ];
+    let aspecto = width / height;
+    let matrizVista = calcularMatrizVista();
+    let matrizProjecao = calcularMatrizProjecao(aspecto);
+    let matrizPV = math.multiply(matrizProjecao, matrizVista);
 
-    const matrizRotacaoX = [
-        [1, 0, 0, 0],
-        [0, Math.cos(rotX), -Math.sin(rotX), 0],
-        [0, Math.sin(rotX), Math.cos(rotX), 0],
-        [0, 0, 0, 1],
-    ];
+    let pontosProjetados = [];
+    let pontosValidos = [];
 
-    const matrizRotacaoY = [
-        [Math.cos(rotY), 0, Math.sin(rotY), 0],
-        [0, 1, 0, 0],
-        [-Math.sin(rotY), 0, Math.cos(rotY), 0],
-        [0, 0, 0, 1],
-    ];
+    for (let i = 0; i < matrizDoObjeto.length; i++) {
+        let v = matrizDoObjeto[i];
+        let pHomogeneo = [v[0], v[1], v[2], 1];
 
-    // Faz a combinação das transformações: translação -> rotação -> objeto
-    let matrizTransformada = math.matrix(matrizDoObjeto);
-    matrizTransformada = math.transpose(matrizTransformada);
-    let matrizTransformacao = math.multiply(matrizTranslacao, math.multiply(matrizRotacaoY, matrizRotacaoX));
-    matrizTransformada = math.multiply(matrizTransformacao, matrizTransformada);
-    // matrizTransformada = math.multiply(matrizTranslacao, math.multiply(matrizRotacaoY, math.multiply(matrizRotacaoX, matrizTransformada)));
+        let pClip = math.multiply(matrizPV, pHomogeneo);
+        let w = pClip[3];
 
-    calcularVetorNormalAoPlano();
-    calcularD();
-    calcularMatrizPerspectiva();
-
-    matrizFinal = math.multiply(math.matrix(matrizPerspectiva), matrizTransformada);
-
-    // Normalização da coordenada homogênea após a projeção em perspectiva
-    // Percorre cada coluna da matriz matrizFinal e divide todos os elementos dessa coluna pelo valor da quarta coordenada w
-    let numColunas = matrizFinal.size()[1];
-    for (let col = 0; col < numColunas; col++) {
-        const w = matrizFinal.get([3, col]);
-        if (w !== 0) {
-            for (let row = 0; row < matrizFinal.size()[0]; row++) {
-                matrizFinal.set([row, col], matrizFinal.get([row, col]) / w);
-            }
+        if (w > zNear) {
+            let xNDC = pClip[0] / w;
+            let yNDC = pClip[1] / w;
+            let xTela = (xNDC + 1) * 0.5 * width;
+            let yTela = (1 - yNDC) * 0.5 * height;
+            pontosProjetados.push([xTela, yTela, pClip[2] / w]);
+            pontosValidos.push(true);
+        } else {
+            pontosProjetados.push([0, 0, 0]);
+            pontosValidos.push(false);
         }
     }
-
-    calcularTransformacaoViewport();
 
     atualizarDadosSim();
 
-    if (tipoDesenho == 0)
-    {
-        // Pontos
-
-        for (let i = 0; i < matrizDoObjeto.length; i++)
-        {
-            const x = matrizFinal.get([0,i]);
-            const y = matrizFinal.get([1,i]);
-
-            if (x < 0 || x > windowWidth || y < 0 || y > windowHeight)
-            {
-                continue;
+    if (tipoDesenho == 0) {
+        for (let i = 0; i < pontosProjetados.length; i++) {
+            if (pontosValidos[i]) {
+                let p = pontosProjetados[i];
+                if (p[0] >= 0 && p[0] <= width && p[1] >= 0 && p[1] <= height) {
+                    point(p[0], p[1]);
+                }
             }
-
-            point(x,y);
         }
-        
-    }
-    else if (tipoDesenho == 1)
-    {
-        // Linhas
-        // Apenas triângulos por hora
-
-        const linhasDesenhadas = new Map();
-
-
-        for (let i = 0; i < faces.length; i++)
-        {
-            const idx_pt1 = faces[i][0] - 1;
-            const idx_pt2 = faces[i][1] - 1;
-            const idx_pt3 = faces[i][2] - 1;
-
-            const [x1, y1, z1] = [matrizFinal.get([0,idx_pt1]), matrizFinal.get([1,idx_pt1]), matrizFinal.get([2,idx_pt1])];
-            const [x2, y2, z2] = [matrizFinal.get([0,idx_pt2]), matrizFinal.get([1,idx_pt2]), matrizFinal.get([2,idx_pt2])];
-            const [x3, y3, z3] = [matrizFinal.get([0,idx_pt3]), matrizFinal.get([1,idx_pt3]), matrizFinal.get([2,idx_pt3])];
-            
-           
-            const criarChaveLinha = (idx1, idx2) => {
-                return [Math.min(idx1, idx2), Math.max(idx1, idx2)].join("-");
-            };
-
-            const chave12 = criarChaveLinha(idx_pt1, idx_pt2);
-            if (!linhasDesenhadas.has(chave12)) {
-                line(x1, y1, x2, y2);
-                linhasDesenhadas.set(chave12, true);
-            }
-
-            const chave13 = criarChaveLinha(idx_pt1, idx_pt3);
-            if (!linhasDesenhadas.has(chave13)) {
-                line(x1, y1, x3, y3);
-                linhasDesenhadas.set(chave13, true);
-            }
-
-            const chave23 = criarChaveLinha(idx_pt2, idx_pt3);
-            if (!linhasDesenhadas.has(chave23)) {
-                line(x2, y2, x3, y3);
-                linhasDesenhadas.set(chave23, true);
-            }
-            // line(x1, y1, x2, y2);
-            // line(x1, y1, x3, y3);
-            // line(x2, y2, x3, y3);
-
-        }        
-    }
-    else {
-        // Formas com preechimento
+    } else if (tipoDesenho == 1) {
+        let linhasDesenhadas = new Set();
         for (let face of faces) {
-            beginShape();
-            for (let idx of face) {
-                const x = matrizFinal.get([0, idx - 1]);
-                const y = matrizFinal.get([1, idx - 1]);
+            for (let i = 0; i < face.length; i++) {
+                let idx1 = face[i] - 1;
+                let idx2 = face[(i + 1) % face.length] - 1;
 
-                // if (x < 0 || x > windowWidth || y < 0 || y > windowHeight)
-                // {
-                //     continue;
-                // }
-                vertex(x, y);
+                if (pontosValidos[idx1] && pontosValidos[idx2]) {
+                    let minIdx = Math.min(idx1, idx2);
+                    let maxIdx = Math.max(idx1, idx2);
+                    let chave = `${minIdx}-${maxIdx}`;
+
+                    if (!linhasDesenhadas.has(chave)) {
+                        linhasDesenhadas.add(chave);
+                        line(pontosProjetados[idx1][0], pontosProjetados[idx1][1], pontosProjetados[idx2][0], pontosProjetados[idx2][1]);
+                    }
+                }
             }
-            endShape(CLOSE);
+        }
+    } else {
+        for (let face of faces) {
+            let faceValida = true;
+            for (let idx of face) {
+                if (!pontosValidos[idx - 1]) {
+                    faceValida = false;
+                    break;
+                }
+            }
+            if (faceValida) {
+                beginShape();
+                for (let idx of face) {
+                    let p = pontosProjetados[idx - 1];
+                    vertex(p[0], p[1]);
+                }
+                endShape(CLOSE);
+            }
         }
     }
-
-    flagDesenhar = false;
 }
 
-// Handlers 
-
 document.getElementById("executar").addEventListener("click", () => {
-    calcularVetorNormalAoPlano();
-    if (matrizDoObjeto == [])
-    {
-        alert("Faça o upload de um arquivo .obj primeiro!");
+    if (matrizDoObjeto.length === 0) {
+        alert("Carregue um arquivo .obj válido previamente.");
         return;
     }
     flagExecutando = true;
-    flagDesenhar = true;
-    calcularUVIniciais();
 });
 
 document.getElementById("carregar").addEventListener("click", () => {
-    // carregar pré-processamento aqui
-    
-    buscarTipoDesenho();
-    carregarPontoDeVista();
-    carregarDadosDoPlano();
-    
-
+    let elemTipo = document.getElementById("tipo-desenho");
+    if (elemTipo) tipoDesenho = parseInt(elemTipo.value, 10);
     document.getElementById("executar").disabled = false;
     document.getElementById("pausar").disabled = false;
 });
@@ -479,82 +249,53 @@ document.getElementById("pausar").addEventListener("click", () => {
 });
 
 document.getElementById("normalizar-objeto").addEventListener("click", () => {
+    if (matrizDoObjeto.length === 0) return;
+
     let minX = Infinity, minY = Infinity, minZ = Infinity;
     let maxX = -Infinity, maxY = -Infinity, maxZ = -Infinity;
-    
+
     for (let i = 0; i < matrizDoObjeto.length; i++) {
-        let x = matrizDoObjeto[i][0];
-        let y = matrizDoObjeto[i][1];
-        let z = matrizDoObjeto[i][2];
-
-        minX = Math.min(minX, x);
-        minY = Math.min(minY, y);
-        minZ = Math.min(minZ, z);
-
-        maxX = Math.max(maxX, x);
-        maxY = Math.max(maxY, y);
-        maxZ = Math.max(maxZ, z);
+        let [x, y, z] = matrizDoObjeto[i];
+        minX = Math.min(minX, x); minY = Math.min(minY, y); minZ = Math.min(minZ, z);
+        maxX = Math.max(maxX, x); maxY = Math.max(maxY, y); maxZ = Math.max(maxZ, z);
     }
-    
-    let width = maxX - minX;
-    let height = maxY - minY;
-    let depth = maxZ - minZ;
 
-    let maxDimension = Math.max(width, height, depth);
-    
+    let centroX = (minX + maxX) / 2;
+    let centroY = (minY + maxY) / 2;
+    let centroZ = (minZ + maxZ) / 2;
+    let escalaMax = Math.max(maxX - minX, maxY - minY, maxZ - minZ);
+
+    if (escalaMax === 0) return;
+
     for (let i = 0; i < matrizDoObjeto.length; i++) {
-        let x = matrizDoObjeto[i][0];
-        let y = matrizDoObjeto[i][1];
-        let z = matrizDoObjeto[i][2];
-
-        let normalizedX = (x - minX) / maxDimension;
-        let normalizedY = (y - minY) / maxDimension;
-        let normalizedZ = (z - minZ) / maxDimension;
-
-        matrizDoObjeto[i][0] = normalizedX;
-        matrizDoObjeto[i][1] = normalizedY;
-        matrizDoObjeto[i][2] = normalizedZ;
+        matrizDoObjeto[i][0] = (matrizDoObjeto[i][0] - centroX) / escalaMax;
+        matrizDoObjeto[i][1] = (matrizDoObjeto[i][1] - centroY) / escalaMax;
+        matrizDoObjeto[i][2] = (matrizDoObjeto[i][2] - centroZ) / escalaMax;
     }
 });
 
-
-// Entrada de arquivo 3D
 document.getElementById("file-input").addEventListener("change", async (event) => {
     const file = event.target.files[0];
     if (file && file.name.endsWith(".obj")) {
         const data = await file.text();
         parseObjFile(data);
     } else {
-        alert("Arquivo .obj inválido!");
+        alert("Arquivo .obj inválido.");
     }
 });
 
-// Parse do arquivo
 function parseObjFile(data) {
+    matrizDoObjeto = [];
+    faces = [];
     const lines = data.split('\n');
-    // const vertices = []; 
-    // const faces = []; 
 
     lines.forEach((line) => {
         const parts = line.trim().split(/\s+/);
         if (parts[0] === 'v') {
-            // se for um vértice
-            let vertex = parts.slice(1).map(Number);
-            vertex.push(1);
-            matrizDoObjeto.push(vertex);
-        } 
-        else if (parts[0] === 'f') {
-            // se for uma face
-            const face = parts.slice(1).map(triade => {
-                return parseInt(triade.split('/')[0], 10); // dependendo do arquivo, as faces são definidas como 'f 1/2/3', em que 2 representa a textura e 1 é o índice do vetor normal
-            });
+            matrizDoObjeto.push([parseFloat(parts[1]), parseFloat(parts[2]), parseFloat(parts[3])]);
+        } else if (parts[0] === 'f') {
+            const face = parts.slice(1).map(triade => parseInt(triade.split('/')[0], 10));
             faces.push(face);
         }
     });
-
-    // console.log("Vertices:", matrizDoObjeto);
-    // console.log("Faces:", faces);
-
-    // return {vertices, faces}
 }
-
